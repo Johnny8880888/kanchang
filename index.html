@@ -351,6 +351,12 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 <textarea id="importText" placeholder="貼上備份內容"></textarea>
 <button class="btn ghost small" onclick="importFromText()">還原</button>
 </div>
+
+<div class="card">
+<h2>清空資料</h2>
+<p class="muted">出發前把測試資料清掉用。會刪除所有廠商、報價和照片，無法復原。</p>
+<button class="btn del" onclick="wipeAll()">清除全部資料</button>
+</div>
 </section>
 </main>
 <div class="toast" id="toast"></div>
@@ -744,7 +750,13 @@ async function renderThumbs(where){
   if(cur<0){$('e_thumbs').innerHTML=ePendingPhotos.length?ePendingPhotos.map((d,i)=>`<div><img src="${d}" onclick="view(this.src)"><b onclick="ePendingPhotos.splice(${i},1);renderThumbs('e')">✕</b></div>`).join(''):'<p class="muted">尚無照片</p>';return}
   const v=mem.vendors[cur];const ps=v&&v.id?await getPhotos(v.id):[];
   $('e_thumbs').innerHTML=ps.length?ps.map(p=>`<div><img src="${p.data}" onclick="view(this.src)"><b onclick="if(confirm('刪除這張照片？')){delPhoto('${p.id}');mem.vendors[cur].photoCount=Math.max(0,(mem.vendors[cur].photoCount||1)-1);persist();setTimeout(()=>renderThumbs('e'),150)}">✕</b></div>`).join(''):'<p class="muted">尚無照片</p>'}
-openDB().then(()=>{});
+
+/* 開啟時自動清掉沒有對應廠商的照片 */
+async function cleanOrphans(){if(!db)return 0;const ids=new Set(mem.vendors.map(v=>v.id));const all=await allPhotos();let n=0;
+  for(const p of all){if(!ids.has(p.vid)){delPhoto(p.id);n++}}return n}
+async function wipeAll(){if(!confirm('會刪除所有廠商、報價和照片，確定？'))return;if(!confirm('再確認一次：真的全部清空？'))return;
+  mem.vendors=[];persist();if(db)db.transaction('p','readwrite').objectStore('p').clear();memPhotos=[];quickReset();toast('已全部清空');showTab('quick')}
+openDB().then(()=>cleanOrphans());
 load();mem.vendors.forEach(v=>{if(!v.id)v.id=newId()});seed();renderList();renderChips();renderMat();toggleQRows();qcalc();
 if(!storeOK)toast('這個瀏覽器無法自動存檔，請記得按「複製文字」備份');
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
