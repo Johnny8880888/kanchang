@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>看廠報價</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="看廠報價">
+<meta name="theme-color" content="#f2f1ef">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--bg:#f2f1ef;--card:#fff;--ink:#1c1c1c;--sub:#6e6e6e;--line:#d6d4d0;--red:#a83e2c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;padding-top:max(12px,env(safe-area-inset-top))!important;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px 0}
+h1{font-size:20px;margin:0 0 8px}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav button{flex:none;border:0;background:none;padding:8px 12px;font-size:15px;color:var(--sub);border-bottom:2px solid transparent}
+nav button.on{color:var(--ink);font-weight:700;border-color:var(--ink)}
+main{padding:16px;max-width:760px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{font-size:17px;margin:0 0 10px}
+.card h3{font-size:15px;margin:14px 0 8px;color:var(--sub);font-weight:600}
+label{display:block;font-size:13px;color:var(--sub);margin:8px 0 3px}
+input,select,textarea{width:100%;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-family:inherit}
+textarea{min-height:70px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn{display:inline-block;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;padding:10px 14px;font-size:15px;margin:4px 6px 4px 0}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.del{background:#fff;color:var(--red);border-color:var(--red)}
+.vendor{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+.vendor:last-child{border-bottom:0}
+.vendor b{font-size:16px}
+.muted{color:var(--sub);font-size:13px}
+.big{font-size:26px;font-weight:700}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.res div{background:var(--bg);border-radius:8px;padding:10px}
+.res .k{font-size:12px;color:var(--sub)}
+.res .v{font-size:20px;font-weight:700}
+.bad{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--sub);font-weight:600;font-size:12px}
+.scroll{overflow-x:auto}
+.item{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.item>div:first-child{grid-column:1/-1}
+.item input,.item select{padding:7px;font-size:15px}
+.chk{display:flex;gap:16px;flex-wrap:wrap}
+.chk label{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:15px;margin:6px 0}
+.chk input{width:auto}
+.hide{display:none!important}
+.other{margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chips button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:9px 14px;font-size:15px}
+.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.qrow{margin-top:12px}.qrow>.k{font-size:13px;color:var(--sub)}
+.pass{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;border:1px solid currentColor;margin-left:6px}
+.thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.thumbs div{position:relative;width:72px;height:72px}
+.thumbs img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.thumbs b{position:absolute;top:-6px;right:-6px;background:#fff;border:1px solid var(--line);border-radius:50%;width:22px;height:22px;font-size:13px;line-height:20px;text-align:center}
+.pblock{border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:6px}
+.mat{width:100%;text-align:left;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.chips input{width:140px;padding:7px 9px;font-size:15px}
+#viewer{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:20}
+#viewer img{max-width:100%;max-height:90%}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+<h1>廣州看廠報價器</h1>
+<nav>
+<button data-tab="quick" class="on">快速記錄</button>
+<button data-tab="list">廠商</button>
+<button data-tab="edit">填報價</button>
+<button data-tab="compare">比較</button>
+<button data-tab="set">設定與備份</button>
+</nav>
+</header>
+<main>
+
+<!-- 廠商清單 -->
+<section id="tab-quick">
+<div class="card">
+<label>廠商名稱</label><input id="q_name">
+<div class="qrow"><div class="k">照片</div>
+<div class="thumbs" id="q_thumbs"></div>
+<label class="btn ghost" style="display:inline-block;margin-top:6px">＋ 拍照<input type="file" accept="image/*" capture="environment" class="hide" onchange="addPhotos(this,'q')"></label>
+<label class="btn ghost small" style="display:inline-block">從相簿選<input type="file" accept="image/*" multiple class="hide" onchange="addPhotos(this,'q')"></label>
+</div>
+<label style="margin-top:14px">單價（人民幣）</label>
+<div class="pblock">
+<div class="row"><div><label>櫃身板（／㎡）</label><input id="q_carcass" type="number" inputmode="decimal"></div>
+<div><label>材質</label><button class="mat" id="q_cMat" onclick="togMat('c')"></button></div></div>
+<div id="q_cPanel" class="hide"></div>
+</div>
+<div class="pblock">
+<div class="row"><div><label>門板（／㎡）</label><input id="q_door" type="number" inputmode="decimal"></div>
+<div><label>材質</label><button class="mat" id="q_dMat" onclick="togMat('d')"></button></div></div>
+<div id="q_dPanel" class="hide"></div>
+</div>
+<div class="row3">
+<div><label>背板（／㎡）</label><input id="q_back" type="number" inputmode="decimal"></div>
+<div><label>抽屜（／組）</label><input id="q_drawer" type="number" inputmode="decimal"></div>
+<div><label>鉸鏈（／個）</label><input id="q_hinge" type="number" inputmode="decimal"></div>
+</div>
+<div id="q_out"></div>
+<div id="q_chips"></div>
+<div class="row"><div><label>起訂量</label><input id="q_moq"></div><div><label>交期</label><input id="q_lead"></div></div>
+<label>一句話備註</label><input id="q_note">
+<div style="margin-top:14px">
+<button class="btn" onclick="quickSave()">存好了，下一家</button>
+<button class="btn ghost" onclick="quickReset()">清空</button>
+</div>
+<p class="muted">按「存好了」會同時複製這家的文字摘要，請貼到備忘錄備份（照片不在摘要裡）。</p>
+</div>
+</section>
+
+<section id="tab-list" class="hide">
+<div class="card">
+<h2>已記錄廠商</h2>
+<div id="vendorList"></div>
+<button class="btn" onclick="newVendor()">＋ 新增廠商</button>
+</div>
+</section>
+
+<!-- 填報價 -->
+<section id="tab-edit" class="hide">
+<div class="card">
+<h2 id="editTitle">新增廠商</h2>
+<label>廠商名稱</label><input id="f_name" placeholder="例：佛山某某家居">
+<div class="row">
+<div><label>聯絡人</label><input id="f_contact"></div>
+<div><label>電話／微信</label><input id="f_phone"></div>
+</div>
+<div class="row">
+<div><label>地點</label><input id="f_place" placeholder="例：廣州番禺"></div>
+<div><label>拜訪日期</label><input id="f_date" type="date"></div>
+</div>
+</div>
+
+<div class="card" id="askCard">
+<h2>還沒問到的</h2>
+<div id="askList"></div>
+</div>
+
+<div class="card">
+<h2>試算（填這裡就會算毛利）</h2>
+<div class="row"><div><label>櫃身基材</label><select id="f_cBase"></select></div><div><label>櫃身工藝</label><select id="f_cSurf"></select></div></div>
+<div class="row"><div><label>門板基材</label><select id="f_doorBase"></select></div><div><label>門板工藝</label><select id="f_doorSurf"></select></div></div>
+<div class="row">
+<div id="wPriceBox"><label>衣櫃單價（人民幣）</label><input id="f_wPrice" type="number" inputmode="decimal"></div>
+<div><label>計價單位</label>
+<select id="f_wUnit" class="calc"><option value="proj">每投影㎡（全包）</option><option value="exp">每展開㎡（單一價）</option><option value="parts">分項（櫃身／背板／門板）</option></select></div>
+</div>
+<div class="row3" id="partsRow">
+<div><label>櫃身板（／㎡）</label><input id="f_carcassPrice" type="number" inputmode="decimal"></div>
+<div><label>背板（／㎡）</label><input id="f_backPrice" type="number" inputmode="decimal"></div>
+<div><label>門板（／㎡）</label><input id="f_doorPrice2" type="number" inputmode="decimal"></div>
+</div>
+<div class="chk" id="chkRow">
+<label><input type="checkbox" id="f_wDoor" checked>單價含門板</label>
+<label><input type="checkbox" id="f_wHinge" checked>單價含鉸鏈</label>
+</div>
+<div class="row" id="doorRow">
+<div><label>門板單價（人民幣／㎡）</label><input id="f_doorPrice" type="number" inputmode="decimal"></div>
+<div></div>
+</div>
+<div class="row" id="hingeRow">
+<div><label>鉸鏈單價（人民幣／個）</label><input id="f_hingePrice" type="number" inputmode="decimal"></div>
+<div></div>
+</div>
+<div class="row">
+<div><label>抽屜整組（人民幣／組）</label><input id="f_dPrice" type="number" inputmode="decimal" placeholder="抽盒＋滑軌＋面板"></div>
+<div></div>
+</div>
+<div id="calcOut"></div>
+</div>
+
+<div class="card">
+<h2>照片</h2>
+<div class="thumbs" id="e_thumbs"></div>
+<label class="btn ghost" style="display:inline-block;margin-top:6px">＋ 拍照<input type="file" accept="image/*" capture="environment" class="hide" onchange="addPhotos(this,'e')"></label>
+<label class="btn ghost small" style="display:inline-block">從相簿選<input type="file" accept="image/*" multiple class="hide" onchange="addPhotos(this,'e')"></label>
+</div>
+
+<div class="card">
+<h2>板材報價</h2>
+<div id="boardItems"></div>
+<button class="btn ghost small" onclick="addItem('boards')">＋ 加一筆板材</button>
+<h3>五金報價</h3>
+<div id="hwItems"></div>
+<button class="btn ghost small" onclick="addItem('hw')">＋ 加一筆五金</button>
+</div>
+
+<div class="card">
+<h2>交易條件</h2>
+<label>單價含不含加工（封邊、打孔、開槽）</label>
+<select id="f_process"><option value="">未問</option><option>全含（封邊打孔都含）</option><option>只含封邊，打孔另計</option><option>不含，素板價</option></select>
+<div class="row">
+<div><label>貿易條件</label>
+<select id="f_term"><option value="">未問</option><option>EXW 出廠</option><option>FOB</option><option>送到集運倉</option><option>其他</option></select></div>
+<div><label>報價含稅</label>
+<select id="f_tax"><option value="">未問</option><option>含稅</option><option>未稅</option></select></div>
+</div>
+<div class="row">
+<div><label>起訂量</label><input id="f_moq" placeholder="例：5 萬人民幣／一個櫃"></div>
+<div><label>交期</label><input id="f_lead" placeholder="例：板式 7 天"></div>
+</div>
+<div class="row">
+<div><label>酷家樂拆單</label>
+<select id="f_kjl"><option value="">未問</option><option>收檔，工廠免費拆單</option><option>收檔，拆單另收費</option><option>要我們自己拆好</option><option>不收酷家樂</option></select></div>
+<div><label>出口方式</label>
+<select id="f_export"><option value="">未問</option><option>可開出口發票</option><option>配合買單出口</option><option>都不行</option></select></div>
+</div>
+<div class="row">
+<div><label>甲醛等級</label>
+<select id="f_ef"><option value="">未問</option><option>ENF</option><option>E0</option><option>E1</option><option>其他／不清楚</option></select></div>
+<div><label>檢驗報告</label>
+<select id="f_report"><option value="">未問</option><option>有，已拿到</option><option>有，會寄</option><option>沒有</option></select></div>
+</div>
+<div class="row">
+<div><label>滑軌品牌／承重</label><input id="f_slide" placeholder="例：東泰 DTC 35kg"></div>
+<div><label>錯件補件（天）</label><input id="f_fix" type="number" inputmode="numeric"></div>
+</div>
+<div class="row">
+<div><label>樣品</label>
+<select id="f_sample"><option value="">未拿</option><option>已拿到</option><option>會寄</option></select></div>
+<div><label>印象分數（1–5）</label>
+<select id="f_score"><option value="">—</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+</div>
+<label>備註（照片編號、名片、印象）</label><textarea id="f_note"></textarea>
+</div>
+
+<button class="btn" onclick="saveVendor()">儲存</button>
+<button class="btn ghost" onclick="showTab('list')">取消</button>
+<button class="btn del hide" id="delBtn" onclick="delVendor()">刪除這家</button>
+</section>
+
+<!-- 比較 -->
+<section id="tab-compare" class="hide">
+<div class="card">
+<h2>各家比較</h2>
+<div class="muted" id="cmpNote"></div>
+<div class="scroll"><table id="cmpTable"></table></div>
+</div>
+<div class="card">
+<h2>及格價（人民幣出廠價，依目前設定）</h2>
+<div class="scroll"><table id="passTable"></table></div>
+</div>
+</section>
+
+<!-- 設定 -->
+<section id="tab-set" class="hide">
+<div class="card">
+<h2>計算設定</h2>
+<div class="row">
+<div><label>匯率（人民幣→台幣）</label><input id="s_rate" type="number" step="0.01" inputmode="decimal"></div>
+<div><label>安裝運輸清運（%）</label><input id="s_install" type="number" inputmode="decimal"></div>
+</div>
+<label>目標毛利（%）</label><input id="s_margin" type="number" inputmode="decimal">
+<h3>運費（運到烏日倉）</h3>
+<label>算法</label>
+<select id="s_frMode" class="calc"><option value="sqm">依板材面積（每㎡）</option><option value="pct">佔貨值 %</option></select>
+<div class="row3">
+<div><label>18mm 板 每㎡</label><input id="s_f18" type="number" inputmode="decimal"></div>
+<div><label>9mm 背板 每㎡</label><input id="s_f9" type="number" inputmode="decimal"></div>
+<div><label>佔貨值 %</label><input id="s_freight" type="number" inputmode="decimal"></div>
+</div>
+<button class="btn ghost small" onclick="preset(61,31)">躍通到門 61／31</button>
+<button class="btn ghost small" onclick="preset(28,28)">20 呎半櫃 28</button>
+<button class="btn ghost small" onclick="preset(14,14)">20 呎滿櫃 14</button>
+<label>五金、抽屜運費（佔貨值 %）<span class="bad">　待確認</span></label><input id="s_hwPct" type="number" inputmode="decimal">
+<h3>衣櫃換算（到頂、含門，1 尺＝30 cm）</h3>
+<div class="row3">
+<div><label>每尺投影㎡</label><input id="s_proj" type="number" step="0.01" inputmode="decimal"></div>
+<div><label>每尺展開㎡</label><input id="s_exp" type="number" step="0.01" inputmode="decimal"></div>
+<div><label>每尺鉸鏈數</label><input id="s_hinge" type="number" step="0.1" inputmode="decimal"></div>
+</div>
+<div class="row3">
+<div><label>每尺櫃身板㎡</label><input id="s_carcassArea" type="number" step="0.01" inputmode="decimal"></div>
+<div><label>每尺背板㎡</label><input id="s_backArea" type="number" step="0.01" inputmode="decimal"></div>
+<div><label>每尺門板㎡</label><input id="s_doorArea" type="number" step="0.01" inputmode="decimal"></div>
+</div>
+<h3>對標售價（台灣行情用台幣輸入，含安裝；換算人民幣如下）</h3>
+<div class="row">
+<div><label>設計公司 衣櫃每尺</label><input id="s_wA" type="number" inputmode="numeric"></div>
+<div><label>一般系統櫃 衣櫃每尺</label><input id="s_wB" type="number" inputmode="numeric"></div>
+</div>
+<div class="row">
+<div><label>設計公司 抽屜每組</label><input id="s_dA" type="number" inputmode="numeric"></div>
+<div><label>一般系統櫃 抽屜每組</label><input id="s_dB" type="number" inputmode="numeric"></div>
+</div>
+<p class="muted" id="rmbHint"></p>
+<button class="btn" onclick="saveSettings()">儲存設定</button>
+<button class="btn ghost" onclick="resetSettings()">還原預設</button>
+</div>
+
+<div class="card">
+<h2>備份</h2>
+<p class="muted">資料只存在這支手機的瀏覽器裡。每看完一家，建議按一次「複製文字」貼到備忘錄或微信，以免資料不見。</p>
+<button class="btn" onclick="copyText()">複製文字（貼備忘錄）</button>
+<button class="btn ghost" onclick="downloadJSON()">下載備份檔（含照片）</button>
+<button class="btn ghost" onclick="downloadCSV()">下載 Excel 用 CSV</button>
+<label>還原：選擇之前下載的備份檔</label>
+<input type="file" id="importFile" accept=".json,application/json">
+<label>或貼上備份文字後按還原</label>
+<textarea id="importText" placeholder="貼上備份內容"></textarea>
+<button class="btn ghost small" onclick="importFromText()">還原</button>
+</div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+<div id="viewer" class="hide" onclick="this.classList.add('hide')"><img id="viewerImg"></div>
+
+<script>
+const KEY='hm_gz_vendor_v1', SKEY='hm_gz_settings_v1';
+const DEF={byWeight:true,frMode:"sqm",f18:61,f9:31,hwPct:15,rate:5.0,freight:25,install:8,margin:58,proj:0.72,exp:2.61,hinge:2.7,carcassArea:1.17,backArea:0.72,doorArea:0.72,wA:6650,wB:5000,dA:3000,dB:2000};
+let mem={vendors:[],settings:{...DEF}};
+let storeOK=true;
+function load(){
+  try{const v=localStorage.getItem(KEY);if(v)mem.vendors=JSON.parse(v);
+      const s=localStorage.getItem(SKEY);if(s)mem.settings={...DEF,...JSON.parse(s)};}
+  catch(e){storeOK=false}
+}
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify(mem.vendors));localStorage.setItem(SKEY,JSON.stringify(mem.settings));}
+  catch(e){storeOK=false;toast('這個瀏覽器無法自動存檔，請記得按「複製文字」備份')}
+}
+const S=()=>mem.settings;
+const $=id=>document.getElementById(id);
+const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
+const fmt=(n,d=0)=>n==null||!isFinite(n)?'—':n.toLocaleString('zh-TW',{maximumFractionDigits:d,minimumFractionDigits:d});
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+
+/* 計算 */
+const BASES=['顆粒板','愛格板','夾板','密集板','實木','歐松板'],SURFS=['雙飾面','PET','UV 超晶','烤漆','吸塑','木皮','防火板'];
+const KG={'顆粒板':13,'愛格板':13,'夾板':11,'密集板':14.5,'實木':13.5,'歐松板':12};
+const kf=b=>S().byWeight?(KG[b]||13)/13:1; // 躍通依重量計費，整櫃不分基材
+function frChi(v){const s=S();v=v||{};return s.f18*(kf(v.cBase)*s.carcassArea+kf(v.doorBase)*s.doorArea)+s.f9*s.backArea} // 每尺板材運費
+function wardrobeCostTWD(v){ // 每尺落地成本（人民幣）；缺的項目當 0，另由 wMissing 提醒
+  const s=S();let rmb;
+  if(v.wUnit==='parts'){
+    const c=num(v.carcassPrice);if(c==null)return null;
+    rmb=c*s.carcassArea+(num(v.backPrice)||0)*s.backArea+(num(v.doorPrice2)||0)*s.doorArea;
+  }else{
+    const p=num(v.wPrice);if(p==null)return null;
+    rmb=p*(v.wUnit==='exp'?s.exp:s.proj);
+    if(!v.wDoor)rmb+=(num(v.doorPrice)||0)*s.doorArea;
+  }
+  const hinge=v.wHinge?0:(num(v.hingePrice)||0)*s.hinge;
+  if(s.frMode==='pct')return (rmb+hinge)*(1+s.freight/100);
+  return rmb+frChi(v)+hinge*(1+s.hwPct/100);
+}
+function wMissing(v){const m=[];
+  if(v.wUnit==='parts'){if(num(v.backPrice)==null)m.push('背板');if(num(v.doorPrice2)==null)m.push('門板')}
+  else if(!v.wDoor&&num(v.doorPrice)==null)m.push('門板');
+  if(!v.wHinge&&num(v.hingePrice)==null)m.push('鉸鏈');return m}
+function drawerCostTWD(v){const p=num(v.dPrice);if(p==null)return null;const s=S();return p*(1+(s.frMode==='pct'?s.freight:s.hwPct)/100)}
+const frText=()=>S().frMode==='pct'?`運費 ${S().freight}%`:`運費每㎡ ${S().f18}／背板 ${S().f9}`;
+const R=twd=>twd/S().rate; // 台幣對標價換人民幣
+function marginAt(cost,sellTWD){if(cost==null)return null;const net=R(sellTWD)/(1+S().install/100);return (1-cost/net)*100}
+function sellFor(cost){if(cost==null)return null;const s=S();return cost/(1-s.margin/100)*(1+s.install/100)}
+function mCls(m){return m!=null&&m<S().margin?'bad':''}
+
+/* 分頁 */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+function showTab(t){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  ['quick','list','edit','compare','set'].forEach(x=>$('tab-'+x).classList.toggle('hide',x!==t));
+  if(t==='list')renderList();if(t==='compare')renderCompare();if(t==='set')fillSettings();
+  window.scrollTo(0,0);
+}
+
+/* 清單 */
+function renderList(){
+  const L=$('vendorList');
+  if(!mem.vendors.length){L.innerHTML='<p class="muted">還沒有資料。</p>';return}
+  L.innerHTML=mem.vendors.map((v,i)=>{
+    const c=wardrobeCostTWD(v),mA=marginAt(c,S().wA),mB=marginAt(c,S().wB);
+    return `<div class="vendor"><div><b>${esc(v.name||'未命名')}</b><div class="muted">${esc(v.place||'')} ${v.term?'｜'+esc(v.term):''} ${v.kjl?'｜'+esc(v.kjl):''}</div>
+    <div class="muted">衣櫃每尺成本 ¥${fmt(c)}${wMissing(v).length?'<span class="bad">（未含'+wMissing(v).join('、')+'）</span>':''}｜毛利 對設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>／對系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></div></div>
+    ${askMissing(v).length?`<div class="bad" style="font-size:13px">還有 ${askMissing(v).length} 項沒問</div>`:''}</div>
+    <button class="btn ghost small" onclick="editVendor(${i})">開啟</button></div>`}).join('');
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* 編輯 */
+const F=['cBase','cSurf','doorBase','doorSurf','process','name','contact','phone','place','date','wPrice','wUnit','carcassPrice','backPrice','doorPrice2','doorPrice','hingePrice','dPrice','term','tax','moq','lead','kjl','export','ef','report','slide','fix','sample','score','note'];
+let cur=-1,items={boards:[],hw:[]};
+function newVendor(){cur=-1;setTimeout(()=>renderThumbs('e'),50);fillForm({...QDEF,wUnit:'proj',wDoor:true,wHinge:true,date:new Date().toISOString().slice(0,10),boards:[],hw:[]});$('editTitle').textContent='新增廠商';$('delBtn').classList.add('hide');showTab('edit')}
+function editVendor(i){cur=i;fillForm(mem.vendors[i]);setTimeout(()=>renderThumbs('e'),50);$('editTitle').textContent=mem.vendors[i].name||'編輯廠商';$('delBtn').classList.remove('hide');showTab('edit')}
+function fillForm(v){
+  F.forEach(k=>{const e=$('f_'+k);if(e.tagName==='SELECT'&&e._oth)setSel(e,v[k]);else e.value=v[k]??''});
+  $('f_wDoor').checked=v.wDoor!==false;$('f_wHinge').checked=v.wHinge!==false;
+  items={boards:(v.boards||[]).map(x=>({...x})),hw:(v.hw||[]).map(x=>({...x}))};
+  renderItems();toggleRows();calc();
+}
+function readForm(){
+  const v={};F.forEach(k=>{const e=$('f_'+k);v[k]=(e.tagName==='SELECT'&&e._oth)?getSel(e):e.value.trim()});
+  v.wDoor=$('f_wDoor').checked;v.wHinge=$('f_wHinge').checked;
+  v.boards=items.boards.filter(x=>x.name||x.price);v.hw=items.hw.filter(x=>x.name||x.price);
+  return v;
+}
+function saveVendor(){
+  const v=readForm();if(!v.name){toast('請填廠商名稱');return}
+  v.updated=new Date().toISOString();
+  if(cur<0){v.id=newId();mem.vendors.push(v)}else{v.id=mem.vendors[cur].id||newId();v.photoCount=mem.vendors[cur].photoCount||0;mem.vendors[cur]=v}
+  persist();toast('已儲存');showTab('list');
+}
+function delVendor(){if(cur<0)return;if(!confirm('確定刪除這家廠商的資料？'))return;mem.vendors.splice(cur,1);persist();showTab('list')}
+function toggleRows(){const parts=$('f_wUnit').value==='parts';
+  $('partsRow').classList.toggle('hide',!parts);$('wPriceBox').classList.toggle('hide',parts);
+  $('f_wDoor').parentNode.classList.toggle('hide',parts);
+  $('doorRow').classList.toggle('hide',parts||$('f_wDoor').checked);$('hingeRow').classList.toggle('hide',$('f_wHinge').checked)}
+['f_wDoor','f_wHinge'].forEach(id=>$(id).addEventListener('change',()=>{toggleRows();calc()}));
+['f_wPrice','f_carcassPrice','f_backPrice','f_doorPrice2','f_doorPrice','f_hingePrice','f_dPrice'].forEach(id=>$(id).addEventListener('input',calc));
+$('f_wUnit').addEventListener('change',()=>{toggleRows();calc()});
+document.querySelector('#tab-edit').addEventListener('input',calc);document.querySelector('#tab-edit').addEventListener('change',calc);document.querySelector('#tab-edit').addEventListener('custom',calc,true);
+
+const ASK=[['process','單價含不含加工（封邊、打孔、開槽）'],['hingePrice','鉸鏈單價',v=>!v.wHinge],['dPrice','抽屜整組（抽盒＋滑軌＋面板）'],['slide','滑軌品牌、承重、開合次數'],
+ ['term','出廠價還是送到集運倉'],['tax','含不含稅'],['export','能否開出口發票或買單出口'],['moq','起訂量'],['kjl','收不收酷家樂拆單、收不收費'],['report','甲醛檢驗報告'],['fix','錯件補件幾天'],['sample','拿樣品']];
+function askMissing(v){return ASK.filter(([k,t,cond])=>(!cond||cond(v))&&!String(v[k]??'').trim()&&!(k==='slide'&&false)).map(x=>x[1])}
+function renderAsk(v){const m=askMissing(v);
+  $('askList').innerHTML=m.length?m.map((t,i)=>`<div class="bad" style="padding:3px 0">${i+1}. ${t}</div>`).join(''):'<p class="muted">都問到了</p>'}
+function calc(){
+  const v=readForm(),s=S(),c=wardrobeCostTWD(v),d=drawerCostTWD(v);renderAsk(v);
+  let h='';
+  if(c!=null){
+    const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB);
+    const miss=wMissing(v);
+    h+=`<h3>衣櫃（每尺）</h3>${miss.length?`<p class="bad" style="margin:0">未含：${miss.join('、')}（待問，目前以 0 計）</p>`:''}<div class="res">
+    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(c)}</div></div>
+    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sellFor(c))}</div></div>
+    <div><div class="k">賣 ¥${fmt(R(s.wA))}（設計公司）毛利</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%</div></div>
+    <div><div class="k">賣 ¥${fmt(R(s.wB))}（系統櫃）毛利</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%</div></div></div>`;
+  }
+  if(d!=null){
+    const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB);
+    h+=`<h3>抽屜（每組）</h3><div class="res">
+    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(d)}</div></div>
+    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sellFor(d))}</div></div>
+    <div><div class="k">賣 ¥${fmt(R(s.dA))}（設計公司）毛利</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%</div></div>
+    <div><div class="k">賣 ¥${fmt(R(s.dB))}（系統櫃）毛利</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%</div></div></div>`;
+  }
+  $('calcOut').innerHTML=h||'<p class="muted">填入衣櫃或抽屜單價就會顯示結果。金額皆為人民幣。</p>';
+}
+
+/* 板材／五金明細 */
+const UNITS=['每展開㎡','每投影㎡','每張','每片','每組','每個','每米','每樘'];
+function addItem(k){items[k].push({name:'',spec:'',unit:k==='boards'?'每展開㎡':'每個',price:''});renderItems()}
+function renderItems(){
+  ['boards','hw'].forEach(k=>{
+    const box=$(k==='boards'?'boardItems':'hwItems');
+    if(!items[k].length){box.innerHTML='<p class="muted">尚無資料</p>';return}
+    box.innerHTML=items[k].map((x,i)=>`<div class="item">
+      <div><label>${k==='boards'?'品項':'五金'}</label><input value="${esc(x.name)}" placeholder="${k==='boards'?'例：顆粒板雙飾面 18mm':'例：阻尼全拉滑軌'}" oninput="items.${k}[${i}].name=this.value"></div>
+      <div><label>規格／品牌</label><input value="${esc(x.spec)}" oninput="items.${k}[${i}].spec=this.value"></div>
+      <div><label>單位</label><select data-k="${k}" data-i="${i}">${UNITS.map(u=>`<option ${u===x.unit?'selected':''}>${u}</option>`).join('')}</select></div>
+      <div><label>人民幣</label><input type="number" inputmode="decimal" value="${esc(x.price)}" oninput="items.${k}[${i}].price=this.value"></div>
+      <button class="btn del small" onclick="items.${k}.splice(${i},1);renderItems()">刪</button></div>`).join('');
+    box.querySelectorAll('select').forEach(sel=>{setupOther(sel);const it=items[sel.dataset.k][sel.dataset.i];setSel(sel,it.unit);
+      const up=()=>it.unit=getSel(sel);sel.addEventListener('change',up);sel.addEventListener('custom',up)});
+  });
+}
+
+/* 比較 */
+function renderCompare(){
+  const s=S();
+  $('cmpNote').textContent=`金額皆為人民幣｜匯率 ${s.rate}｜${frText()}｜安裝 ${s.install}%｜目標毛利 ${s.margin}%（紅字＝低於目標）`;
+  const rows=mem.vendors.map(v=>{
+    const c=wardrobeCostTWD(v),d=drawerCostTWD(v);
+    return {v,c,d,mA:marginAt(c,s.wA),mB:marginAt(c,s.wB),dA:marginAt(d,s.dA),dB:marginAt(d,s.dB)};
+  }).sort((a,b)=>(a.c??1e9)-(b.c??1e9));
+  $('cmpTable').innerHTML=`<tr><th>廠商</th><th>衣櫃成本/尺 ¥</th><th>對設計公司</th><th>對系統櫃</th><th>抽屜成本 ¥</th><th>對設計公司</th><th>對系統櫃</th><th>條件</th><th>拆單</th><th>起訂量</th><th>交期</th></tr>`+
+  (rows.length?rows.map(r=>`<tr><td>${esc(r.v.name)}</td><td>${fmt(r.c)}</td>
+   <td class="${mCls(r.mA)}">${fmt(r.mA,1)}%</td><td class="${mCls(r.mB)}">${fmt(r.mB,1)}%</td>
+   <td>${fmt(r.d)}</td><td class="${mCls(r.dA)}">${fmt(r.dA,1)}%</td><td class="${mCls(r.dB)}">${fmt(r.dB,1)}%</td>
+   <td>${esc(r.v.term||'—')}</td><td>${esc(r.v.kjl||'—')}</td><td>${esc(r.v.moq||'—')}</td><td>${esc(r.v.lead||'—')}</td></tr>`).join(''):'<tr><td colspan="11" class="muted">尚無資料</td></tr>');
+  const tgt=(sell,m)=>R(sell)/(1+s.install/100)*(1-m/100);
+  const pass=(sell,unit)=>[58,50,40].map(m=>s.frMode==='pct'?tgt(sell,m)/(1+s.freight/100)/unit:(tgt(sell,m)-frChi())/unit);
+  const passD=sell=>[58,50,40].map(m=>tgt(sell,m)/(1+(s.frMode==='pct'?s.freight:s.hwPct)/100));
+  const L=[['衣櫃 每投影㎡｜設計公司',pass(s.wA,s.proj)],['衣櫃 每投影㎡｜系統櫃',pass(s.wB,s.proj)],['衣櫃 每展開㎡｜設計公司',pass(s.wA,s.exp)],['衣櫃 每展開㎡｜系統櫃',pass(s.wB,s.exp)],['抽屜每組｜設計公司',passD(s.dA)],['抽屜每組｜系統櫃',passD(s.dB)]];
+  $('passTable').innerHTML='<tr><th></th><th>毛利 58%</th><th>50%</th><th>40%</th></tr>'+L.map(([n,a])=>`<tr><td>${n}</td>${a.map(x=>`<td>${fmt(x)}</td>`).join('')}</tr>`).join('');
+}
+
+/* 設定 */
+const SK=Object.keys(DEF);
+function fillSettings(){SK.forEach(k=>$('s_'+k).value=S()[k]);rmbHint()}
+function preset(a,b){$('s_frMode').value='sqm';$('s_f18').value=a;$('s_f9').value=b;S().byWeight=(a===61);saveSettings()}
+function rmbHint(){const r=num($('s_rate').value)||S().rate,g=k=>fmt((num($('s_'+k).value)||0)/r);
+  $('rmbHint').textContent=`換算人民幣：設計公司 衣櫃每尺 ¥${g('wA')}、抽屜 ¥${g('dA')}｜系統櫃 衣櫃每尺 ¥${g('wB')}、抽屜 ¥${g('dB')}`}
+['s_rate','s_wA','s_wB','s_dA','s_dB'].forEach(id=>$(id).addEventListener('input',rmbHint));
+function saveSettings(){SK.forEach(k=>{if(k==='frMode'){S().frMode=$('s_frMode').value;return}if(k==='byWeight')return;const n=num($('s_'+k).value);if(n!=null)S()[k]=n});persist();toast('設定已儲存')}
+function resetSettings(){mem.settings={...DEF};fillSettings();persist();toast('已還原預設')}
+
+/* 備份 */
+function textDump(){
+  const s=S();let t=`廣州看廠紀錄（${new Date().toLocaleDateString('zh-TW')}）\n匯率 ${s.rate}｜${frText()}\n`;
+  mem.vendors.forEach(v=>{
+    const c=wardrobeCostTWD(v),d=drawerCostTWD(v);
+    t+=`\n■ ${v.name}｜${v.place||''}｜${v.contact||''} ${v.phone||''}\n`;
+    t+=(v.wUnit==='parts'?`衣櫃 櫃身 ${v.carcassPrice||'—'}／背板 ${v.backPrice||'—'}／門板 ${v.doorPrice2||'—'} 人民幣/㎡`:`衣櫃 ${v.wPrice||'—'} 人民幣/${v.wUnit==='exp'?'展開㎡':'投影㎡'}${v.wDoor?'':'（不含門，門板 '+(v.doorPrice||'—')+'）'}`)+`${v.wHinge?'':'（不含鉸鏈，鉸鏈 '+(v.hingePrice||'—')+'）'}，每尺成本 ¥${fmt(c)}，毛利 設計公司 ${fmt(marginAt(c,s.wA),1)}%／系統櫃 ${fmt(marginAt(c,s.wB),1)}%\n`;
+    t+=`抽屜 ${v.dPrice||'—'} 人民幣/組，成本 ¥${fmt(d)}\n`;
+    (v.boards||[]).forEach(x=>t+=`板材：${x.name} ${x.spec} ${x.price} 人民幣${x.unit}\n`);
+    (v.hw||[]).forEach(x=>t+=`五金：${x.name} ${x.spec} ${x.price} 人民幣${x.unit}\n`);
+    t+=`櫃身 ${v.cBase||'—'}・${v.cSurf||'—'}｜門板 ${v.doorBase||'—'}・${v.doorSurf||'—'}｜照片 ${v.photoCount||0} 張\n`;
+    t+=`加工 ${v.process||'—'}｜條件 ${v.term||'—'}｜${v.tax||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'} 天｜拆單 ${v.kjl||'—'}｜出口 ${v.export||'—'}\n`;
+    t+=`甲醛 ${v.ef||'—'}｜報告 ${v.report||'—'}｜滑軌 ${v.slide||'—'}｜補件 ${v.fix||'—'} 天｜樣品 ${v.sample||'—'}｜分數 ${v.score||'—'}\n`;
+    if(v.note)t+=`備註：${v.note}\n`;
+  });
+  t+=`\n#備份資料\n`+JSON.stringify(mem);
+  return t;
+}
+function copyText(){
+  const t=textDump();
+  const ok=()=>toast('已複製，請貼到備忘錄');
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(ok,()=>fallback(t));else fallback(t);
+  function fallback(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){toast('無法複製')}a.remove()}
+}
+function dl(name,data,type){const b=new Blob([data],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const stamp=()=>new Date().toISOString().slice(0,10).replace(/-/g,'');
+async function downloadJSON(){const photos=await allPhotos();dl(`廣州看廠備份_${stamp()}.json`,JSON.stringify({...mem,photos}),'application/json')}
+function downloadCSV(){
+  const s=S(),H=['廠商','地點','聯絡人','電話','日期','衣櫃單價','單位','含門','門板單價','含鉸鏈','鉸鏈單價','衣櫃每尺成本_人民幣','毛利_設計公司','毛利_系統櫃','抽屜單價','抽屜成本_人民幣','櫃身材質','門板材質','加工','貿易條件','含稅','起訂量','交期','酷家樂拆單','出口','甲醛','檢驗報告','滑軌','補件天數','樣品','分數','板材明細','五金明細','備註'];
+  const q=x=>`"${String(x??'').replace(/"/g,'""')}"`;
+  const R=mem.vendors.map(v=>{const c=wardrobeCostTWD(v);return [v.name,v.place,v.contact,v.phone,v.date,v.wUnit==='parts'?`櫃身${v.carcassPrice||''}/背板${v.backPrice||''}/門板${v.doorPrice2||''}`:v.wPrice,{proj:'投影㎡',exp:'展開㎡',parts:'分項'}[v.wUnit],v.wDoor?'是':'否',v.doorPrice,v.wHinge?'是':'否',v.hingePrice,c==null?'':Math.round(c),fmt(marginAt(c,s.wA),1),fmt(marginAt(c,s.wB),1),v.dPrice,(()=>{const d=drawerCostTWD(v);return d==null?'':Math.round(d)})(),`${v.cBase||''}${v.cSurf||''}`,`${v.doorBase||''}${v.doorSurf||''}`,v.process,v.term,v.tax,v.moq,v.lead,v.kjl,v.export,v.ef,v.report,v.slide,v.fix,v.sample,v.score,(v.boards||[]).map(x=>`${x.name} ${x.spec} ${x.price}${x.unit}`).join('；'),(v.hw||[]).map(x=>`${x.name} ${x.spec} ${x.price}${x.unit}`).join('；'),v.note].map(q).join(',')});
+  dl(`廣州看廠_${stamp()}.csv`,'﻿'+[H.map(q).join(','),...R].join('\n'),'text/csv')
+}
+function restore(obj){
+  if(!obj||!Array.isArray(obj.vendors))throw 0;
+  if(mem.vendors.length&&!confirm(`還原會覆蓋目前 ${mem.vendors.length} 家的資料，確定？`))return;
+  mem={vendors:obj.vendors,settings:{...DEF,...(obj.settings||{})}};persist();
+  (obj.photos||[]).forEach(p=>{if(db)db.transaction('p','readwrite').objectStore('p').put(p);else memPhotos.push(p)});toast('已還原');showTab('list');
+}
+$('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{restore(JSON.parse(r.result))}catch(x){toast('檔案格式不對')}};r.readAsText(f)});
+function importFromText(){let t=$('importText').value;const i=t.indexOf('#備份資料');if(i>=0)t=t.slice(i+5);try{restore(JSON.parse(t.trim()))}catch(x){toast('內容格式不對')}}
+
+function seed(){}
+/* 下拉選單加「其他」自填 */
+function setupOther(sel){
+  if(sel.dataset.oth)return;sel.dataset.oth=1;
+  if(![...sel.options].some(o=>o.value==='__o'))sel.add(new Option('其他（自己填）','__o'));
+  [...sel.options].forEach(o=>{if(o.text==='其他'&&o.value!=='__o')o.remove()});
+  const inp=document.createElement('input');inp.className='other hide';inp.placeholder='請填寫';
+  sel.after(inp);sel._oth=inp;
+  sel.addEventListener('change',()=>{inp.classList.toggle('hide',sel.value!=='__o');if(sel.value==='__o')inp.focus()});
+  inp.addEventListener('input',()=>sel.dispatchEvent(new Event('custom')));
+}
+function getSel(sel){return sel.value==='__o'?sel._oth.value.trim():sel.value}
+function setSel(sel,val){val=val??'';
+  if([...sel.options].some(o=>o.value===val&&val!=='__o')){sel.value=val;sel._oth.value='';sel._oth.classList.add('hide')}
+  else{sel.value='__o';sel._oth.value=val;sel._oth.classList.remove('hide')}}
+[['f_cBase',BASES],['f_doorBase',BASES],['f_cSurf',SURFS],['f_doorSurf',SURFS]].forEach(([id,a])=>a.forEach(x=>$(id).add(new Option(x,x))));
+document.querySelectorAll('#tab-edit select:not(.calc)').forEach(setupOther);
+
+/* 快速記錄 */
+const QC=[['process','含不含加工',[['全含','全含（封邊打孔都含）'],['只封邊','只含封邊，打孔另計'],['素板','不含，素板價']]],
+ ['term','價格是',[['出廠價','EXW 出廠'],['到集運倉','送到集運倉'],['FOB','FOB']]],
+ ['tax','含稅',[['含稅','含稅'],['未稅','未稅']]],
+ ['kjl','酷家樂',[['免費拆單','收檔，工廠免費拆單'],['拆單收費','收檔，拆單另收費'],['要自己拆','要我們自己拆好'],['不收','不收酷家樂']]],
+ ['export','出口',[['出口發票','可開出口發票'],['買單出口','配合買單出口'],['都不行','都不行']]],
+ ['ef','甲醛',[['ENF','ENF'],['E0','E0'],['E1','E1']]],
+ ['sample','樣品',[['已拿','已拿到'],['會寄','會寄']]],
+ ['score','印象',[['5','5'],['4','4'],['3','3'],['2','2'],['1','1']]]];
+const QDEF={cBase:'顆粒板',cSurf:'雙飾面',doorBase:'顆粒板',doorSurf:'雙飾面'};
+let qv={...QDEF},qOth={};
+function chipRow(k,title,opts){const val=qv[k]||'',known=opts.some(o=>o[1]===val),oth=qOth[k]||(val&&!known);
+  return `<div class="qrow"><div class="k">${title}</div><div class="chips">${opts.map(([l,x])=>`<button class="${val===x&&!oth?'on':''}" onclick="pick('${k}','${x}')">${l}</button>`).join('')}
+  <button class="${oth?'on':''}" onclick="pickOther('${k}')">其他</button>${oth?`<input id="oth_${k}" value="${esc(known?'':val)}" placeholder="請填寫" oninput="qv['${k}']=this.value.trim();qcalc();matLabel()">`:''}</div></div>`}
+function pick(k,x){qOth[k]=false;qv[k]=qv[k]===x?'':x;renderChips();renderMat();qcalc()}
+function pickOther(k){qOth[k]=!qOth[k];if(!qOth[k])qv[k]='';else if(QC.concat(MATC).find(r=>r[0]===k)[2].some(o=>o[1]===qv[k]))qv[k]='';renderChips();renderMat();qcalc();const e=$('oth_'+k);if(e)e.focus()}
+const opt=a=>a.map(x=>[x,x]);
+const MATC=[['cBase','櫃身基材',opt(BASES)],['cSurf','櫃身工藝',opt(SURFS)],['doorBase','門板基材',opt(BASES)],['doorSurf','門板工藝',opt(SURFS)]];
+function renderChips(){$('q_chips').innerHTML=QC.map(r=>chipRow(...r)).join('')}
+function renderMat(){$('q_cPanel').innerHTML=chipRow(...MATC[0])+chipRow(...MATC[1]);$('q_dPanel').innerHTML=chipRow(...MATC[2])+chipRow(...MATC[3]);matLabel()}
+function matLabel(){$('q_cMat').textContent=`${qv.cBase||'—'}・${qv.cSurf||'—'}　▾`;$('q_dMat').textContent=`${qv.doorBase||'—'}・${qv.doorSurf||'—'}　▾`}
+function togMat(w){$('q_'+w+'Panel').classList.toggle('hide')}
+function qVendor(){return {name:$('q_name').value.trim(),wUnit:'parts',carcassPrice:$('q_carcass').value,backPrice:$('q_back').value,doorPrice2:$('q_door').value,
+  wDoor:true,wHinge:false,hingePrice:$('q_hinge').value,dPrice:$('q_drawer').value,moq:$('q_moq').value.trim(),lead:$('q_lead').value.trim(),
+  note:$('q_note').value.trim(),date:new Date().toISOString().slice(0,10),boards:[],hw:[],...qv}}
+function badge(m){if(m==null)return '';return m>=S().margin?`<span class="pass">合格</span>`:`<span class="pass bad">不合格</span>`}
+function qcalc(){const v=qVendor(),s=S(),c=wardrobeCostTWD(v),d=drawerCostTWD(v);let h='';
+  if(c!=null){const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB),miss=wMissing(v);
+    h+=`<div class="res"><div><div class="k">衣櫃每尺成本</div><div class="v">¥${fmt(c)}</div></div><div><div class="k">毛利 ${s.margin}% 要賣</div><div class="v">¥${fmt(sellFor(c))}</div></div>
+    <div><div class="k">對設計公司</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%${badge(mA)}</div></div><div><div class="k">對系統櫃</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%${badge(mB)}</div></div></div>`+
+    (miss.length?`<p class="bad" style="margin:6px 0 0">未含：${miss.join('、')}（以 0 計）</p>`:'')}
+  if(d!=null){const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB);h+=`<p style="margin:8px 0 0">抽屜成本 ¥${fmt(d)}｜設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>｜系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></p>`}
+  $('q_out').innerHTML=h;}
+function quickReset(){['q_name','q_carcass','q_back','q_door','q_drawer','q_hinge','q_moq','q_lead','q_note'].forEach(id=>$(id).value='');qv={...QDEF};qOth={};qPhotos=[];
+  renderChips();renderMat();$('q_cPanel').classList.add('hide');$('q_dPanel').classList.add('hide');renderThumbs('q');qcalc()}
+function oneText(v){const c=wardrobeCostTWD(v),s=S();
+  return `■ ${v.name}｜櫃身 ${v.cBase||''}${v.cSurf||''} ${v.carcassPrice||'—'}／門板 ${v.doorBase||''}${v.doorSurf||''} ${v.doorPrice2||'—'}／背板 ${v.backPrice||'—'}／抽屜 ${v.dPrice||'—'}／鉸鏈 ${v.hingePrice||'—'}｜衣櫃每尺 ¥${fmt(c)}，設計公司 ${fmt(marginAt(c,s.wA),1)}%、系統櫃 ${fmt(marginAt(c,s.wB),1)}%｜加工 ${v.process||'—'}｜${v.term||'—'}｜${v.tax||'—'}｜酷家樂 ${v.kjl||'—'}｜出口 ${v.export||'—'}｜甲醛 ${v.ef||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'}｜分數 ${v.score||'—'}｜照片 ${v.photoCount||0} 張｜${v.note||''}`}
+async function quickSave(){const v=qVendor();if(!v.name){toast('請填廠商名稱');return}
+  v.id=newId();v.updated=new Date().toISOString();v.photoCount=qPhotos.length;
+  for(const d of qPhotos)await putPhoto(v.id,d);
+  mem.vendors.push(v);persist();
+  const t=oneText(v);const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity=0;document.body.appendChild(a);a.select();a.setSelectionRange(0,t.length);
+  let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();
+  if(!ok&&navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});
+  toast('已存，摘要已複製');quickReset();window.scrollTo(0,0)}
+['q_carcass','q_back','q_door','q_drawer','q_hinge'].forEach(id=>$(id).addEventListener('input',qcalc));
+
+/* 照片：存在這支手機的瀏覽器（IndexedDB），壓縮到長邊 1600 */
+const newId=()=>'v'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let db=null,memPhotos=[],qPhotos=[];
+function openDB(){return new Promise(r=>{try{const q=indexedDB.open('hm_gz_photos',1);q.onupgradeneeded=()=>q.result.createObjectStore('p',{keyPath:'id'});
+  q.onsuccess=()=>{db=q.result;r()};q.onerror=()=>r()}catch(e){r()}})}
+function putPhoto(vid,data){const rec={id:newId(),vid,data,t:Date.now()};
+  if(!db){memPhotos.push(rec);return Promise.resolve()}
+  return new Promise(r=>{const tx=db.transaction('p','readwrite');tx.objectStore('p').put(rec);tx.oncomplete=r;tx.onerror=()=>{memPhotos.push(rec);r()}})}
+function getPhotos(vid){if(!db)return Promise.resolve(memPhotos.filter(x=>x.vid===vid));
+  return new Promise(r=>{const out=[];const c=db.transaction('p').objectStore('p').openCursor();c.onsuccess=e=>{const cur=e.target.result;if(cur){if(cur.value.vid===vid)out.push(cur.value);cur.continue()}else r(out.concat(memPhotos.filter(x=>x.vid===vid)))};c.onerror=()=>r(out)})}
+function allPhotos(){if(!db)return Promise.resolve(memPhotos.slice());return new Promise(r=>{const q=db.transaction('p').objectStore('p').getAll();q.onsuccess=()=>r(q.result.concat(memPhotos));q.onerror=()=>r(memPhotos.slice())})}
+function delPhoto(id){memPhotos=memPhotos.filter(x=>x.id!==id);if(db)db.transaction('p','readwrite').objectStore('p').delete(id)}
+function shrink(file){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height));
+  const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',0.75))};im.onerror=()=>r(fr.result);im.src=fr.result};fr.readAsDataURL(file)})}
+async function addPhotos(inp,where){const fs=[...inp.files];inp.value='';
+  for(const f of fs){const d=await shrink(f);
+    if(where==='q')qPhotos.push(d);else{const v=mem.vendors[cur];if(!v){toast('請先儲存廠商');return}if(!v.id){v.id=newId()}await putPhoto(v.id,d);v.photoCount=(v.photoCount||0)+1;persist()}}
+  renderThumbs(where);toast(`已加入 ${fs.length} 張`)}
+function view(src){$('viewerImg').src=src;$('viewer').classList.remove('hide')}
+async function renderThumbs(where){
+  if(where==='q'){$('q_thumbs').innerHTML=qPhotos.map((d,i)=>`<div><img src="${d}" onclick="view(this.src)"><b onclick="qPhotos.splice(${i},1);renderThumbs('q')">✕</b></div>`).join('');return}
+  const v=mem.vendors[cur];const ps=v&&v.id?await getPhotos(v.id):[];
+  $('e_thumbs').innerHTML=ps.length?ps.map(p=>`<div><img src="${p.data}" onclick="view(this.src)"><b onclick="if(confirm('刪除這張照片？')){delPhoto('${p.id}');mem.vendors[cur].photoCount=Math.max(0,(mem.vendors[cur].photoCount||1)-1);persist();setTimeout(()=>renderThumbs('e'),150)}">✕</b></div>`).join(''):'<p class="muted">尚無照片</p>'}
+openDB().then(()=>{});
+load();mem.vendors.forEach(v=>{if(!v.id)v.id=newId()});seed();renderList();renderChips();renderMat();qcalc();
+if(!storeOK)toast('這個瀏覽器無法自動存檔，請記得按「複製文字」備份');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+</script>
+</body>
+</html>
