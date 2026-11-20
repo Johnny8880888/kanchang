@@ -29,7 +29,7 @@ input,select,textarea{width:100%;font-size:16px;padding:9px 10px;border:1px soli
 textarea{min-height:70px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.btn{display:inline-block;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;padding:10px 14px;font-size:15px;margin:4px 6px 4px 0}
+.btn{display:inline-block;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;padding:10px 14px;font-size:15px;margin:4px 6px 4px 0;cursor:pointer}
 .btn.ghost{background:#fff;color:var(--ink)}
 .btn.small{padding:6px 10px;font-size:13px}
 .btn.del{background:#fff;color:var(--red);border-color:var(--red)}
@@ -42,6 +42,7 @@ textarea{min-height:70px}
 .res div{background:var(--bg);border-radius:8px;padding:10px}
 .res .k{font-size:12px;color:var(--sub)}
 .res .v{font-size:20px;font-weight:700}
+.res .twd{font-size:12px;color:var(--sub);margin-top:2px}
 .bad{color:var(--red)}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
@@ -57,20 +58,20 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 .hide{display:none!important}
 .other{margin-top:6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.chips button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:9px 14px;font-size:15px}
+.chips button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:8px 13px;font-size:14px;cursor:pointer}
 .chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .qrow{margin-top:12px}.qrow>.k{font-size:13px;color:var(--sub)}
 .pass{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;border:1px solid currentColor;margin-left:6px}
 .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .thumbs div{position:relative;width:72px;height:72px}
 .thumbs img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
-.thumbs b{position:absolute;top:-6px;right:-6px;background:#fff;border:1px solid var(--line);border-radius:50%;width:22px;height:22px;font-size:13px;line-height:20px;text-align:center}
+.thumbs b{position:absolute;top:-6px;right:-6px;background:#fff;border:1px solid var(--line);border-radius:50%;width:22px;height:22px;font-size:13px;line-height:20px;text-align:center;cursor:pointer}
 .pblock{border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:6px}
-.mat{width:100%;text-align:left;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.mat{width:100%;text-align:left;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);cursor:pointer}
 .chips input{width:140px;padding:7px 9px;font-size:15px}
 #viewer{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:20}
 #viewer img{max-width:100%;max-height:90%}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;transition:.3s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:30}
 .toast.on{opacity:1}
 </style>
 </head>
@@ -87,7 +88,7 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 </header>
 <main>
 
-<!-- 廠商清單 -->
+<!-- 快速記錄 -->
 <section id="tab-quick">
 <div class="card">
 <label>廠商名稱</label><input id="q_name">
@@ -96,7 +97,19 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 <label class="btn ghost" style="display:inline-block;margin-top:6px">＋ 拍照<input type="file" accept="image/*" capture="environment" class="hide" onchange="addPhotos(this,'q')"></label>
 <label class="btn ghost small" style="display:inline-block">從相簿選<input type="file" accept="image/*" multiple class="hide" onchange="addPhotos(this,'q')"></label>
 </div>
-<label style="margin-top:14px">單價（人民幣）</label>
+
+<div class="qrow"><div class="k">計價方式</div>
+<div class="chips" id="q_unitChips">
+<button data-u="parts" class="on" onclick="setQUnit('parts')">分項（櫃身／門／背板）</button>
+<button data-u="proj" onclick="setQUnit('proj')">投影㎡全包</button>
+<button data-u="exp" onclick="setQUnit('exp')">展開㎡單一價</button>
+</div>
+</div>
+
+<label style="margin-top:12px">單價（人民幣）</label>
+
+<!-- 分項模式 -->
+<div id="q_partsBox">
 <div class="pblock">
 <div class="row"><div><label>櫃身板（／㎡）</label><input id="q_carcass" type="number" inputmode="decimal"></div>
 <div><label>材質</label><button class="mat" id="q_cMat" onclick="togMat('c')"></button></div></div>
@@ -107,10 +120,30 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 <div><label>材質</label><button class="mat" id="q_dMat" onclick="togMat('d')"></button></div></div>
 <div id="q_dPanel" class="hide"></div>
 </div>
+</div>
+
+<!-- 投影/展開模式 -->
+<div id="q_singleBox" class="hide pblock">
+<div class="row">
+<div><label id="q_wPriceLbl">衣櫃單價（／投影㎡）</label><input id="q_wPrice" type="number" inputmode="decimal"></div>
+<div><label>櫃身材質</label><button class="mat" id="q_cMat2" onclick="togMat('c2')"></button></div>
+</div>
+<div id="q_cPanel2" class="hide"></div>
+<div class="chk">
+<label><input type="checkbox" id="q_wDoor" checked onchange="toggleQRows();qcalc()">含門板</label>
+<label><input type="checkbox" id="q_wHinge" checked onchange="toggleQRows();qcalc()">含鉸鏈</label>
+</div>
+<div id="q_singleDoorRow" class="hide">
+<div class="row"><div><label>門板單價（／㎡）</label><input id="q_doorSingle" type="number" inputmode="decimal"></div>
+<div><label>門板材質</label><button class="mat" id="q_dMat2" onclick="togMat('d2')"></button></div></div>
+<div id="q_dPanel2" class="hide"></div>
+</div>
+</div>
+
 <div class="row3">
-<div><label>背板（／㎡）</label><input id="q_back" type="number" inputmode="decimal"></div>
+<div id="q_backWrap"><label>背板（／㎡）</label><input id="q_back" type="number" inputmode="decimal"></div>
 <div><label>抽屜（／組）</label><input id="q_drawer" type="number" inputmode="decimal"></div>
-<div><label>鉸鏈（／個）</label><input id="q_hinge" type="number" inputmode="decimal"></div>
+<div id="q_hingeWrap"><label>鉸鏈（／個）</label><input id="q_hinge" type="number" inputmode="decimal"></div>
 </div>
 <div id="q_out"></div>
 <div id="q_chips"></div>
@@ -124,6 +157,7 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 </div>
 </section>
 
+<!-- 廠商清單 -->
 <section id="tab-list" class="hide">
 <div class="card">
 <h2>已記錄廠商</h2>
@@ -241,6 +275,7 @@ th{color:var(--sub);font-weight:600;font-size:12px}
 </div>
 
 <button class="btn" onclick="saveVendor()">儲存</button>
+<button class="btn ghost hide" id="dupBtn" onclick="dupVendor()">複製這家</button>
 <button class="btn ghost" onclick="showTab('list')">取消</button>
 <button class="btn del hide" id="delBtn" onclick="delVendor()">刪除這家</button>
 </section>
@@ -339,14 +374,15 @@ const S=()=>mem.settings;
 const $=id=>document.getElementById(id);
 const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
 const fmt=(n,d=0)=>n==null||!isFinite(n)?'—':n.toLocaleString('zh-TW',{maximumFractionDigits:d,minimumFractionDigits:d});
+const twdSub=n=>n==null||!isFinite(n)?'':`<div class="twd">約 NT$${fmt(n*S().rate)}</div>`;
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
 
 /* 計算 */
 const BASES=['顆粒板','愛格板','夾板','密集板','實木','歐松板'],SURFS=['雙飾面','PET','UV 超晶','烤漆','吸塑','木皮','防火板'];
 const KG={'顆粒板':13,'愛格板':13,'夾板':11,'密集板':14.5,'實木':13.5,'歐松板':12};
-const kf=b=>S().byWeight?(KG[b]||13)/13:1; // 躍通依重量計費，整櫃不分基材
-function frChi(v){const s=S();v=v||{};return s.f18*(kf(v.cBase)*s.carcassArea+kf(v.doorBase)*s.doorArea)+s.f9*s.backArea} // 每尺板材運費
-function wardrobeCostTWD(v){ // 每尺落地成本（人民幣）；缺的項目當 0，另由 wMissing 提醒
+const kf=b=>S().byWeight?(KG[b]||13)/13:1;
+function frChi(v){const s=S();v=v||{};return s.f18*(kf(v.cBase)*s.carcassArea+kf(v.doorBase)*s.doorArea)+s.f9*s.backArea}
+function wardrobeCostTWD(v){
   const s=S();let rmb;
   if(v.wUnit==='parts'){
     const c=num(v.carcassPrice);if(c==null)return null;
@@ -366,7 +402,7 @@ function wMissing(v){const m=[];
   if(!v.wHinge&&num(v.hingePrice)==null)m.push('鉸鏈');return m}
 function drawerCostTWD(v){const p=num(v.dPrice);if(p==null)return null;const s=S();return p*(1+(s.frMode==='pct'?s.freight:s.hwPct)/100)}
 const frText=()=>S().frMode==='pct'?`運費 ${S().freight}%`:`運費每㎡ ${S().f18}／背板 ${S().f9}`;
-const R=twd=>twd/S().rate; // 台幣對標價換人民幣
+const R=twd=>twd/S().rate;
 function marginAt(cost,sellTWD){if(cost==null)return null;const net=R(sellTWD)/(1+S().install/100);return (1-cost/net)*100}
 function sellFor(cost){if(cost==null)return null;const s=S();return cost/(1-s.margin/100)*(1+s.install/100)}
 function mCls(m){return m!=null&&m<S().margin?'bad':''}
@@ -387,7 +423,7 @@ function renderList(){
   L.innerHTML=mem.vendors.map((v,i)=>{
     const c=wardrobeCostTWD(v),mA=marginAt(c,S().wA),mB=marginAt(c,S().wB);
     return `<div class="vendor"><div><b>${esc(v.name||'未命名')}</b><div class="muted">${esc(v.place||'')} ${v.term?'｜'+esc(v.term):''} ${v.kjl?'｜'+esc(v.kjl):''}</div>
-    <div class="muted">衣櫃每尺成本 ¥${fmt(c)}${wMissing(v).length?'<span class="bad">（未含'+wMissing(v).join('、')+'）</span>':''}｜毛利 對設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>／對系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></div></div>
+    <div class="muted">衣櫃每尺成本 ¥${fmt(c)}${c!=null?`（約 NT$${fmt(c*S().rate)}）`:''}${wMissing(v).length?'<span class="bad">（未含'+wMissing(v).join('、')+'）</span>':''}｜毛利 對設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>／對系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></div>
     ${askMissing(v).length?`<div class="bad" style="font-size:13px">還有 ${askMissing(v).length} 項沒問</div>`:''}</div>
     <button class="btn ghost small" onclick="editVendor(${i})">開啟</button></div>`}).join('');
 }
@@ -395,9 +431,20 @@ function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt
 
 /* 編輯 */
 const F=['cBase','cSurf','doorBase','doorSurf','process','name','contact','phone','place','date','wPrice','wUnit','carcassPrice','backPrice','doorPrice2','doorPrice','hingePrice','dPrice','term','tax','moq','lead','kjl','export','ef','report','slide','fix','sample','score','note'];
-let cur=-1,items={boards:[],hw:[]};
-function newVendor(){cur=-1;setTimeout(()=>renderThumbs('e'),50);fillForm({...QDEF,wUnit:'proj',wDoor:true,wHinge:true,date:new Date().toISOString().slice(0,10),boards:[],hw:[]});$('editTitle').textContent='新增廠商';$('delBtn').classList.add('hide');showTab('edit')}
-function editVendor(i){cur=i;fillForm(mem.vendors[i]);setTimeout(()=>renderThumbs('e'),50);$('editTitle').textContent=mem.vendors[i].name||'編輯廠商';$('delBtn').classList.remove('hide');showTab('edit')}
+let cur=-1,items={boards:[],hw:[]},ePendingPhotos=[];
+function newVendor(){cur=-1;ePendingPhotos=[];setTimeout(()=>renderThumbs('e'),50);fillForm({...QDEF,wUnit:'proj',wDoor:true,wHinge:true,date:new Date().toISOString().slice(0,10),boards:[],hw:[]});$('editTitle').textContent='新增廠商';$('delBtn').classList.add('hide');$('dupBtn').classList.add('hide');showTab('edit')}
+function editVendor(i){cur=i;ePendingPhotos=[];fillForm(mem.vendors[i]);setTimeout(()=>renderThumbs('e'),50);$('editTitle').textContent=mem.vendors[i].name||'編輯廠商';$('delBtn').classList.remove('hide');$('dupBtn').classList.remove('hide');showTab('edit')}
+function dupVendor(){
+  const v=readForm();
+  v.name=(v.name||'未命名')+'（方案2）';
+  cur=-1;ePendingPhotos=[];
+  fillForm(v);
+  renderThumbs('e');
+  $('editTitle').textContent='新增廠商（複製）';
+  $('delBtn').classList.add('hide');$('dupBtn').classList.add('hide');
+  toast('已複製，修改板材或單價後按儲存即可');
+  window.scrollTo(0,0);
+}
 function fillForm(v){
   F.forEach(k=>{const e=$('f_'+k);if(e.tagName==='SELECT'&&e._oth)setSel(e,v[k]);else e.value=v[k]??''});
   $('f_wDoor').checked=v.wDoor!==false;$('f_wHinge').checked=v.wHinge!==false;
@@ -410,13 +457,26 @@ function readForm(){
   v.boards=items.boards.filter(x=>x.name||x.price);v.hw=items.hw.filter(x=>x.name||x.price);
   return v;
 }
-function saveVendor(){
+async function saveVendor(){
   const v=readForm();if(!v.name){toast('請填廠商名稱');return}
   v.updated=new Date().toISOString();
-  if(cur<0){v.id=newId();mem.vendors.push(v)}else{v.id=mem.vendors[cur].id||newId();v.photoCount=mem.vendors[cur].photoCount||0;mem.vendors[cur]=v}
+  if(cur<0){
+    v.id=newId();v.photoCount=ePendingPhotos.length;
+    for(const d of ePendingPhotos)await putPhoto(v.id,d);
+    ePendingPhotos=[];
+    mem.vendors.push(v);
+  }else{
+    v.id=mem.vendors[cur].id||newId();v.photoCount=mem.vendors[cur].photoCount||0;mem.vendors[cur]=v;
+  }
   persist();toast('已儲存');showTab('list');
 }
-function delVendor(){if(cur<0)return;if(!confirm('確定刪除這家廠商的資料？'))return;mem.vendors.splice(cur,1);persist();showTab('list')}
+async function delVendor(){
+  if(cur<0)return;
+  if(!confirm('確定刪除這家廠商的資料與照片？'))return;
+  const vid=mem.vendors[cur].id;
+  if(vid)await delVendorPhotos(vid);
+  mem.vendors.splice(cur,1);persist();showTab('list');
+}
 function toggleRows(){const parts=$('f_wUnit').value==='parts';
   $('partsRow').classList.toggle('hide',!parts);$('wPriceBox').classList.toggle('hide',parts);
   $('f_wDoor').parentNode.classList.toggle('hide',parts);
@@ -428,26 +488,26 @@ document.querySelector('#tab-edit').addEventListener('input',calc);document.quer
 
 const ASK=[['process','單價含不含加工（封邊、打孔、開槽）'],['hingePrice','鉸鏈單價',v=>!v.wHinge],['dPrice','抽屜整組（抽盒＋滑軌＋面板）'],['slide','滑軌品牌、承重、開合次數'],
  ['term','出廠價還是送到集運倉'],['tax','含不含稅'],['export','能否開出口發票或買單出口'],['moq','起訂量'],['kjl','收不收酷家樂拆單、收不收費'],['report','甲醛檢驗報告'],['fix','錯件補件幾天'],['sample','拿樣品']];
-function askMissing(v){return ASK.filter(([k,t,cond])=>(!cond||cond(v))&&!String(v[k]??'').trim()&&!(k==='slide'&&false)).map(x=>x[1])}
+function askMissing(v){return ASK.filter(([k,t,cond])=>(!cond||cond(v))&&!String(v[k]??'').trim()).map(x=>x[1])}
 function renderAsk(v){const m=askMissing(v);
   $('askList').innerHTML=m.length?m.map((t,i)=>`<div class="bad" style="padding:3px 0">${i+1}. ${t}</div>`).join(''):'<p class="muted">都問到了</p>'}
 function calc(){
   const v=readForm(),s=S(),c=wardrobeCostTWD(v),d=drawerCostTWD(v);renderAsk(v);
   let h='';
   if(c!=null){
-    const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB);
+    const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB),sc=sellFor(c);
     const miss=wMissing(v);
     h+=`<h3>衣櫃（每尺）</h3>${miss.length?`<p class="bad" style="margin:0">未含：${miss.join('、')}（待問，目前以 0 計）</p>`:''}<div class="res">
-    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(c)}</div></div>
-    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sellFor(c))}</div></div>
+    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(c)}</div>${twdSub(c)}</div>
+    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sc)}</div>${twdSub(sc)}</div>
     <div><div class="k">賣 ¥${fmt(R(s.wA))}（設計公司）毛利</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%</div></div>
     <div><div class="k">賣 ¥${fmt(R(s.wB))}（系統櫃）毛利</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%</div></div></div>`;
   }
   if(d!=null){
-    const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB);
+    const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB),sd=sellFor(d);
     h+=`<h3>抽屜（每組）</h3><div class="res">
-    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(d)}</div></div>
-    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sellFor(d))}</div></div>
+    <div><div class="k">到烏日倉成本</div><div class="v">¥${fmt(d)}</div>${twdSub(d)}</div>
+    <div><div class="k">毛利 ${s.margin}% 要賣（含安裝）</div><div class="v">¥${fmt(sd)}</div>${twdSub(sd)}</div>
     <div><div class="k">賣 ¥${fmt(R(s.dA))}（設計公司）毛利</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%</div></div>
     <div><div class="k">賣 ¥${fmt(R(s.dB))}（系統櫃）毛利</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%</div></div></div>`;
   }
@@ -494,7 +554,7 @@ function renderCompare(){
 
 /* 設定 */
 const SK=Object.keys(DEF);
-function fillSettings(){SK.forEach(k=>$('s_'+k).value=S()[k]);rmbHint()}
+function fillSettings(){SK.forEach(k=>{const e=$('s_'+k);if(e)e.value=S()[k]});rmbHint()}
 function preset(a,b){$('s_frMode').value='sqm';$('s_f18').value=a;$('s_f9').value=b;S().byWeight=(a===61);saveSettings()}
 function rmbHint(){const r=num($('s_rate').value)||S().rate,g=k=>fmt((num($('s_'+k).value)||0)/r);
   $('rmbHint').textContent=`換算人民幣：設計公司 衣櫃每尺 ¥${g('wA')}、抽屜 ¥${g('dA')}｜系統櫃 衣櫃每尺 ¥${g('wB')}、抽屜 ¥${g('dB')}`}
@@ -513,7 +573,7 @@ function textDump(){
     (v.boards||[]).forEach(x=>t+=`板材：${x.name} ${x.spec} ${x.price} 人民幣${x.unit}\n`);
     (v.hw||[]).forEach(x=>t+=`五金：${x.name} ${x.spec} ${x.price} 人民幣${x.unit}\n`);
     t+=`櫃身 ${v.cBase||'—'}・${v.cSurf||'—'}｜門板 ${v.doorBase||'—'}・${v.doorSurf||'—'}｜照片 ${v.photoCount||0} 張\n`;
-    t+=`加工 ${v.process||'—'}｜條件 ${v.term||'—'}｜${v.tax||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'} 天｜拆單 ${v.kjl||'—'}｜出口 ${v.export||'—'}\n`;
+    t+=`加工 ${v.process||'—'}｜條件 ${v.term||'—'}｜${v.tax||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'}｜拆單 ${v.kjl||'—'}｜出口 ${v.export||'—'}\n`;
     t+=`甲醛 ${v.ef||'—'}｜報告 ${v.report||'—'}｜滑軌 ${v.slide||'—'}｜補件 ${v.fix||'—'} 天｜樣品 ${v.sample||'—'}｜分數 ${v.score||'—'}\n`;
     if(v.note)t+=`備註：${v.note}\n`;
   });
@@ -533,7 +593,7 @@ function downloadCSV(){
   const s=S(),H=['廠商','地點','聯絡人','電話','日期','衣櫃單價','單位','含門','門板單價','含鉸鏈','鉸鏈單價','衣櫃每尺成本_人民幣','毛利_設計公司','毛利_系統櫃','抽屜單價','抽屜成本_人民幣','櫃身材質','門板材質','加工','貿易條件','含稅','起訂量','交期','酷家樂拆單','出口','甲醛','檢驗報告','滑軌','補件天數','樣品','分數','板材明細','五金明細','備註'];
   const q=x=>`"${String(x??'').replace(/"/g,'""')}"`;
   const R=mem.vendors.map(v=>{const c=wardrobeCostTWD(v);return [v.name,v.place,v.contact,v.phone,v.date,v.wUnit==='parts'?`櫃身${v.carcassPrice||''}/背板${v.backPrice||''}/門板${v.doorPrice2||''}`:v.wPrice,{proj:'投影㎡',exp:'展開㎡',parts:'分項'}[v.wUnit],v.wDoor?'是':'否',v.doorPrice,v.wHinge?'是':'否',v.hingePrice,c==null?'':Math.round(c),fmt(marginAt(c,s.wA),1),fmt(marginAt(c,s.wB),1),v.dPrice,(()=>{const d=drawerCostTWD(v);return d==null?'':Math.round(d)})(),`${v.cBase||''}${v.cSurf||''}`,`${v.doorBase||''}${v.doorSurf||''}`,v.process,v.term,v.tax,v.moq,v.lead,v.kjl,v.export,v.ef,v.report,v.slide,v.fix,v.sample,v.score,(v.boards||[]).map(x=>`${x.name} ${x.spec} ${x.price}${x.unit}`).join('；'),(v.hw||[]).map(x=>`${x.name} ${x.spec} ${x.price}${x.unit}`).join('；'),v.note].map(q).join(',')});
-  dl(`廣州看廠_${stamp()}.csv`,'﻿'+[H.map(q).join(','),...R].join('\n'),'text/csv')
+  dl(`廣州看廠_${stamp()}.csv`,'\ufeff'+[H.map(q).join(','),...R].join('\n'),'text/csv')
 }
 function restore(obj){
   if(!obj||!Array.isArray(obj.vendors))throw 0;
@@ -572,7 +632,21 @@ const QC=[['process','含不含加工',[['全含','全含（封邊打孔都含�
  ['sample','樣品',[['已拿','已拿到'],['會寄','會寄']]],
  ['score','印象',[['5','5'],['4','4'],['3','3'],['2','2'],['1','1']]]];
 const QDEF={cBase:'顆粒板',cSurf:'雙飾面',doorBase:'顆粒板',doorSurf:'雙飾面'};
-let qv={...QDEF},qOth={};
+let qv={...QDEF},qOth={},qUnit='parts';
+function setQUnit(u){
+  qUnit=u;
+  document.querySelectorAll('#q_unitChips button').forEach(b=>b.classList.toggle('on',b.dataset.u===u));
+  $('q_wPriceLbl').textContent=u==='proj'?'衣櫃單價（／投影㎡）':'衣櫃單價（／展開㎡）';
+  toggleQRows();qcalc();
+}
+function toggleQRows(){
+  const p=qUnit==='parts';
+  $('q_partsBox').classList.toggle('hide',!p);
+  $('q_singleBox').classList.toggle('hide',p);
+  $('q_backWrap').classList.toggle('hide',!p);
+  $('q_singleDoorRow').classList.toggle('hide',p||$('q_wDoor').checked);
+  $('q_hingeWrap').classList.toggle('hide',!p&&$('q_wHinge').checked);
+}
 function chipRow(k,title,opts){const val=qv[k]||'',known=opts.some(o=>o[1]===val),oth=qOth[k]||(val&&!known);
   return `<div class="qrow"><div class="k">${title}</div><div class="chips">${opts.map(([l,x])=>`<button class="${val===x&&!oth?'on':''}" onclick="pick('${k}','${x}')">${l}</button>`).join('')}
   <button class="${oth?'on':''}" onclick="pickOther('${k}')">其他</button>${oth?`<input id="oth_${k}" value="${esc(known?'':val)}" placeholder="請填寫" oninput="qv['${k}']=this.value.trim();qcalc();matLabel()">`:''}</div></div>`}
@@ -581,33 +655,60 @@ function pickOther(k){qOth[k]=!qOth[k];if(!qOth[k])qv[k]='';else if(QC.concat(MA
 const opt=a=>a.map(x=>[x,x]);
 const MATC=[['cBase','櫃身基材',opt(BASES)],['cSurf','櫃身工藝',opt(SURFS)],['doorBase','門板基材',opt(BASES)],['doorSurf','門板工藝',opt(SURFS)]];
 function renderChips(){$('q_chips').innerHTML=QC.map(r=>chipRow(...r)).join('')}
-function renderMat(){$('q_cPanel').innerHTML=chipRow(...MATC[0])+chipRow(...MATC[1]);$('q_dPanel').innerHTML=chipRow(...MATC[2])+chipRow(...MATC[3]);matLabel()}
-function matLabel(){$('q_cMat').textContent=`${qv.cBase||'—'}・${qv.cSurf||'—'}　▾`;$('q_dMat').textContent=`${qv.doorBase||'—'}・${qv.doorSurf||'—'}　▾`}
+function renderMat(){
+  const cHtml=chipRow(...MATC[0])+chipRow(...MATC[1]);
+  const dHtml=chipRow(...MATC[2])+chipRow(...MATC[3]);
+  $('q_cPanel').innerHTML=cHtml;$('q_dPanel').innerHTML=dHtml;
+  $('q_cPanel2').innerHTML=cHtml;$('q_dPanel2').innerHTML=dHtml;
+  matLabel();
+}
+function matLabel(){
+  const cTxt=`${qv.cBase||'—'}・${qv.cSurf||'—'}　▾`,dTxt=`${qv.doorBase||'—'}・${qv.doorSurf||'—'}　▾`;
+  $('q_cMat').textContent=cTxt;$('q_dMat').textContent=dTxt;
+  $('q_cMat2').textContent=cTxt;$('q_dMat2').textContent=dTxt;
+}
 function togMat(w){$('q_'+w+'Panel').classList.toggle('hide')}
-function qVendor(){return {name:$('q_name').value.trim(),wUnit:'parts',carcassPrice:$('q_carcass').value,backPrice:$('q_back').value,doorPrice2:$('q_door').value,
-  wDoor:true,wHinge:false,hingePrice:$('q_hinge').value,dPrice:$('q_drawer').value,moq:$('q_moq').value.trim(),lead:$('q_lead').value.trim(),
-  note:$('q_note').value.trim(),date:new Date().toISOString().slice(0,10),boards:[],hw:[],...qv}}
+function qVendor(){
+  const p=qUnit==='parts';
+  return {
+    name:$('q_name').value.trim(),wUnit:qUnit,
+    carcassPrice:p?$('q_carcass').value:'',backPrice:p?$('q_back').value:'',doorPrice2:p?$('q_door').value:'',
+    wPrice:p?'':$('q_wPrice').value,doorPrice:p?'':$('q_doorSingle').value,
+    wDoor:p?true:$('q_wDoor').checked,wHinge:p?false:$('q_wHinge').checked,
+    hingePrice:$('q_hinge').value,dPrice:$('q_drawer').value,
+    moq:$('q_moq').value.trim(),lead:$('q_lead').value.trim(),
+    note:$('q_note').value.trim(),date:new Date().toISOString().slice(0,10),boards:[],hw:[],...qv
+  };
+}
 function badge(m){if(m==null)return '';return m>=S().margin?`<span class="pass">合格</span>`:`<span class="pass bad">不合格</span>`}
 function qcalc(){const v=qVendor(),s=S(),c=wardrobeCostTWD(v),d=drawerCostTWD(v);let h='';
-  if(c!=null){const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB),miss=wMissing(v);
-    h+=`<div class="res"><div><div class="k">衣櫃每尺成本</div><div class="v">¥${fmt(c)}</div></div><div><div class="k">毛利 ${s.margin}% 要賣</div><div class="v">¥${fmt(sellFor(c))}</div></div>
+  if(c!=null){const mA=marginAt(c,s.wA),mB=marginAt(c,s.wB),sc=sellFor(c),miss=wMissing(v);
+    h+=`<div class="res"><div><div class="k">衣櫃每尺成本</div><div class="v">¥${fmt(c)}</div>${twdSub(c)}</div><div><div class="k">毛利 ${s.margin}% 要賣</div><div class="v">¥${fmt(sc)}</div>${twdSub(sc)}</div>
     <div><div class="k">對設計公司</div><div class="v ${mCls(mA)}">${fmt(mA,1)}%${badge(mA)}</div></div><div><div class="k">對系統櫃</div><div class="v ${mCls(mB)}">${fmt(mB,1)}%${badge(mB)}</div></div></div>`+
     (miss.length?`<p class="bad" style="margin:6px 0 0">未含：${miss.join('、')}（以 0 計）</p>`:'')}
-  if(d!=null){const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB);h+=`<p style="margin:8px 0 0">抽屜成本 ¥${fmt(d)}｜設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>｜系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></p>`}
+  if(d!=null){const mA=marginAt(d,s.dA),mB=marginAt(d,s.dB);h+=`<p style="margin:8px 0 0">抽屜成本 ¥${fmt(d)}（約 NT$${fmt(d*s.rate)}）｜設計公司 <span class="${mCls(mA)}">${fmt(mA,1)}%</span>｜系統櫃 <span class="${mCls(mB)}">${fmt(mB,1)}%</span></p>`}
   $('q_out').innerHTML=h;}
-function quickReset(){['q_name','q_carcass','q_back','q_door','q_drawer','q_hinge','q_moq','q_lead','q_note'].forEach(id=>$(id).value='');qv={...QDEF};qOth={};qPhotos=[];
-  renderChips();renderMat();$('q_cPanel').classList.add('hide');$('q_dPanel').classList.add('hide');renderThumbs('q');qcalc()}
+function quickReset(){['q_name','q_carcass','q_back','q_door','q_wPrice','q_doorSingle','q_drawer','q_hinge','q_moq','q_lead','q_note'].forEach(id=>$(id).value='');
+  $('q_wDoor').checked=true;$('q_wHinge').checked=true;
+  qv={...QDEF};qOth={};qPhotos=[];setQUnit('parts');
+  renderChips();renderMat();['q_cPanel','q_dPanel','q_cPanel2','q_dPanel2'].forEach(id=>$(id).classList.add('hide'));renderThumbs('q');qcalc()}
 function oneText(v){const c=wardrobeCostTWD(v),s=S();
-  return `■ ${v.name}｜櫃身 ${v.cBase||''}${v.cSurf||''} ${v.carcassPrice||'—'}／門板 ${v.doorBase||''}${v.doorSurf||''} ${v.doorPrice2||'—'}／背板 ${v.backPrice||'—'}／抽屜 ${v.dPrice||'—'}／鉸鏈 ${v.hingePrice||'—'}｜衣櫃每尺 ¥${fmt(c)}，設計公司 ${fmt(marginAt(c,s.wA),1)}%、系統櫃 ${fmt(marginAt(c,s.wB),1)}%｜加工 ${v.process||'—'}｜${v.term||'—'}｜${v.tax||'—'}｜酷家樂 ${v.kjl||'—'}｜出口 ${v.export||'—'}｜甲醛 ${v.ef||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'}｜分數 ${v.score||'—'}｜照片 ${v.photoCount||0} 張｜${v.note||''}`}
-async function quickSave(){const v=qVendor();if(!v.name){toast('請填廠商名稱');return}
+  const priceStr=v.wUnit==='parts'
+    ?`櫃身 ${v.cBase||''}${v.cSurf||''} ${v.carcassPrice||'—'}／門板 ${v.doorBase||''}${v.doorSurf||''} ${v.doorPrice2||'—'}／背板 ${v.backPrice||'—'}`
+    :`衣櫃 ${v.wPrice||'—'}/${v.wUnit==='exp'?'展開㎡':'投影㎡'}${v.wDoor?'':'（不含門，門板 '+(v.doorPrice||'—')+'）'}`;
+  return `■ ${v.name}｜${priceStr}／抽屜 ${v.dPrice||'—'}／鉸鏈 ${v.wHinge?'含':(v.hingePrice||'—')}｜衣櫃每尺 ¥${fmt(c)}（約 NT$${fmt(c!=null?c*s.rate:null)}），設計公司 ${fmt(marginAt(c,s.wA),1)}%、系統櫃 ${fmt(marginAt(c,s.wB),1)}%｜加工 ${v.process||'—'}｜${v.term||'—'}｜${v.tax||'—'}｜酷家樂 ${v.kjl||'—'}｜出口 ${v.export||'—'}｜甲醛 ${v.ef||'—'}｜起訂 ${v.moq||'—'}｜交期 ${v.lead||'—'}｜分數 ${v.score||'—'}｜照片 ${v.photoCount||0} 張｜${v.note||''}`}
+async function quickSave(){
+  const v=qVendor();if(!v.name){toast('請填廠商名稱');return}
   v.id=newId();v.updated=new Date().toISOString();v.photoCount=qPhotos.length;
-  for(const d of qPhotos)await putPhoto(v.id,d);
-  mem.vendors.push(v);persist();
+  // 先同步複製摘要，避免 iOS Safari 在 await 存照片後失去剪貼簿權限
   const t=oneText(v);const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity=0;document.body.appendChild(a);a.select();a.setSelectionRange(0,t.length);
   let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();
   if(!ok&&navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});
-  toast('已存，摘要已複製');quickReset();window.scrollTo(0,0)}
-['q_carcass','q_back','q_door','q_drawer','q_hinge'].forEach(id=>$(id).addEventListener('input',qcalc));
+  for(const d of qPhotos)await putPhoto(v.id,d);
+  mem.vendors.push(v);persist();
+  toast('已存，摘要已複製');quickReset();window.scrollTo(0,0);
+}
+['q_carcass','q_back','q_door','q_wPrice','q_doorSingle','q_drawer','q_hinge'].forEach(id=>$(id).addEventListener('input',qcalc));
 
 /* 照片：存在這支手機的瀏覽器（IndexedDB），壓縮到長邊 1600 */
 const newId=()=>'v'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -621,19 +722,30 @@ function getPhotos(vid){if(!db)return Promise.resolve(memPhotos.filter(x=>x.vid=
   return new Promise(r=>{const out=[];const c=db.transaction('p').objectStore('p').openCursor();c.onsuccess=e=>{const cur=e.target.result;if(cur){if(cur.value.vid===vid)out.push(cur.value);cur.continue()}else r(out.concat(memPhotos.filter(x=>x.vid===vid)))};c.onerror=()=>r(out)})}
 function allPhotos(){if(!db)return Promise.resolve(memPhotos.slice());return new Promise(r=>{const q=db.transaction('p').objectStore('p').getAll();q.onsuccess=()=>r(q.result.concat(memPhotos));q.onerror=()=>r(memPhotos.slice())})}
 function delPhoto(id){memPhotos=memPhotos.filter(x=>x.id!==id);if(db)db.transaction('p','readwrite').objectStore('p').delete(id)}
+function delVendorPhotos(vid){
+  memPhotos=memPhotos.filter(x=>x.vid!==vid);
+  if(!db)return Promise.resolve();
+  return new Promise(r=>{const tx=db.transaction('p','readwrite'),st=tx.objectStore('p'),c=st.openCursor();
+    c.onsuccess=e=>{const cur=e.target.result;if(cur){if(cur.value.vid===vid)st.delete(cur.key);cur.continue()}};
+    tx.oncomplete=r;tx.onerror=r;
+  });
+}
 function shrink(file){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height));
   const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',0.75))};im.onerror=()=>r(fr.result);im.src=fr.result};fr.readAsDataURL(file)})}
 async function addPhotos(inp,where){const fs=[...inp.files];inp.value='';
   for(const f of fs){const d=await shrink(f);
-    if(where==='q')qPhotos.push(d);else{const v=mem.vendors[cur];if(!v){toast('請先儲存廠商');return}if(!v.id){v.id=newId()}await putPhoto(v.id,d);v.photoCount=(v.photoCount||0)+1;persist()}}
+    if(where==='q'){qPhotos.push(d)}
+    else if(cur<0){ePendingPhotos.push(d)}
+    else{const v=mem.vendors[cur];if(!v.id){v.id=newId()}await putPhoto(v.id,d);v.photoCount=(v.photoCount||0)+1;persist()}}
   renderThumbs(where);toast(`已加入 ${fs.length} 張`)}
 function view(src){$('viewerImg').src=src;$('viewer').classList.remove('hide')}
 async function renderThumbs(where){
   if(where==='q'){$('q_thumbs').innerHTML=qPhotos.map((d,i)=>`<div><img src="${d}" onclick="view(this.src)"><b onclick="qPhotos.splice(${i},1);renderThumbs('q')">✕</b></div>`).join('');return}
+  if(cur<0){$('e_thumbs').innerHTML=ePendingPhotos.length?ePendingPhotos.map((d,i)=>`<div><img src="${d}" onclick="view(this.src)"><b onclick="ePendingPhotos.splice(${i},1);renderThumbs('e')">✕</b></div>`).join(''):'<p class="muted">尚無照片</p>';return}
   const v=mem.vendors[cur];const ps=v&&v.id?await getPhotos(v.id):[];
   $('e_thumbs').innerHTML=ps.length?ps.map(p=>`<div><img src="${p.data}" onclick="view(this.src)"><b onclick="if(confirm('刪除這張照片？')){delPhoto('${p.id}');mem.vendors[cur].photoCount=Math.max(0,(mem.vendors[cur].photoCount||1)-1);persist();setTimeout(()=>renderThumbs('e'),150)}">✕</b></div>`).join(''):'<p class="muted">尚無照片</p>'}
 openDB().then(()=>{});
-load();mem.vendors.forEach(v=>{if(!v.id)v.id=newId()});seed();renderList();renderChips();renderMat();qcalc();
+load();mem.vendors.forEach(v=>{if(!v.id)v.id=newId()});seed();renderList();renderChips();renderMat();toggleQRows();qcalc();
 if(!storeOK)toast('這個瀏覽器無法自動存檔，請記得按「複製文字」備份');
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
